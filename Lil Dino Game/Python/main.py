@@ -12,6 +12,7 @@ def main():
 
     grass_img = pygame.image.load("assets/grass.png").convert_alpha()
     poop_img = pygame.image.load("assets/poop.png").convert_alpha()
+    scientist_img = pygame.image.load("assets/scientist.png").convert_alpha()
     triceratops_img = pygame.image.load("assets/triceratops.png").convert_alpha()
     pygame.font.init()
     my_font = pygame.font.SysFont("times new roman", 100)
@@ -30,13 +31,16 @@ def main():
     cursor = 0
     cursor_down = False
     cursor_up = False
+    flask = 0
     pause_menu = False
+    scientist = False
+    scientist_x = 11
+    scientist_y = 11
     timer = 0
 
     dino_data = [dino_x,dino_y]
     poop_data = []
-
-    wallet = 0
+    scientist_data = [scientist_x,scientist_y]
 
     while True:
         screen.fill("black")
@@ -47,23 +51,14 @@ def main():
                 sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-
-                if event.key == K_1:
-                    if not pause_menu:
-                        try:
-                            poop_data.pop(0)
-
-                        except IndexError:
-                            pass
-
-                    else:
-                        if cursor == 0:
-                            pause_menu = False
-
-                if event.key == K_2:
                     pause_menu = True
+
+                if event.key == K_SPACE:
+                    if cursor == 0:
+                        pause_menu = False
+                        
+                    if cursor == 1:
+                        scientist = True
 
                 if event.key == K_DOWN:
                     cursor_down = True
@@ -102,19 +97,18 @@ def main():
                 scientist_text = my_font.render("hire scientist", True, "blue")
                 market_text = my_font.render("goto market", True, "red")
 
-            coin_text = my_font.render(f"coins: {wallet}", True, "yellow")
+            research_text = my_small_font.render(f"research points: {flask}", True, "yellow")
 
             screen.blit(resume_text, (200,0))
             screen.blit(scientist_text, (75,100))
             screen.blit(market_text, (100,200))
-            screen.blit(coin_text, (25,350))
+            screen.blit(research_text, (25,400))
             pygame.display.flip()
             
         if not pause_menu:
             timer += 1
             if timer == 60:
                 timer = 0
-                wallet += 1
                     
             # spawn terrain
             for y, row in enumerate(map_data):
@@ -122,7 +116,7 @@ def main():
                     if tile:
                         display.blit(grass_img, (150 + x * 10 - y * 10, 100 + x * 5 + y * 5))
 
-            # ai
+            # dino ai
             direction = random.randint(1,4)
 
             if dino_data[0] == 0 and dino_data[1] == 11:
@@ -143,8 +137,43 @@ def main():
             if direction == 4 and dino_data[0] < 11 and dino_data[1] < 11:
                 dino_data[1] += 1
 
+            # scientist ai
+            if len(poop_data) > 0 and scientist:
+                if poop_data[0][0] < scientist_data[0]:
+                    scientist_data[0] -= 1
+                elif poop_data[0][1] < scientist_data[1]:
+                    scientist_data[1] -= 1
+                elif poop_data[0][0] > scientist_data[0]:
+                    scientist_data[0] += 1
+                elif poop_data[0][1] > scientist_data[1]:
+                    scientist_data[1] += 1
+                elif list(poop_data[0]) == scientist_data and len(poop_data) > 0:
+                    poop_data.pop(0)
+                    flask += 1
+
+            elif len(poop_data) == 0 and scientist:
+                direction = random.randint(1,4)
+
+                if scientist_data[0] == 0 and scientist_data[1] == 11:
+                    scientist_data[1] -= 1
+
+                if scientist_data[1] == 0 and scientist_data[0] == 11:
+                    scientist_data[0] -= 1
+
+                if direction == 1 and scientist_data[0] > 0 and scientist_data[1] > 0:
+                    scientist_data[0] -= 1
+
+                if direction == 2 and scientist_data[0] < 11 and scientist_data[1] < 11:
+                    scientist_data[0] += 1
+
+                if direction == 3 and scientist_data[0] > 0 and scientist_data[1] > 0:
+                    scientist_data[1] -= 1
+
+                if direction == 4 and scientist_data[0] < 11 and scientist_data[1] < 11:
+                    scientist_data[1] += 1
+
             # poop
-            poop = random.randint(1,60)
+            poop = random.randint(1,15)
 
             if poop == 1:
                 already_pooped = False
@@ -156,8 +185,8 @@ def main():
                     poop_data.append((dino_data[0],dino_data[1]))
 
             # show coins
-            coin_text = my_small_font.render(f"coins: {wallet}", True, "yellow")
-            display.blit(coin_text, (25,25))
+            research_text = my_small_font.render(f"research points: {flask}", True, "yellow")
+            display.blit(research_text, (25,25))
 
             # show poop B)
             for y, row in enumerate(map_data):
@@ -165,8 +194,15 @@ def main():
                     for terd in poop_data:
                         if x == terd[0] and y == terd[1]:
                             display.blit(poop_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - poop_img.get_width()) // 2, 100 + x * 5 + y * 5 - poop_img.get_height() + 15))
+
+            # show scientist
+            if scientist:
+                for y, row in enumerate(map_data):
+                    for x, tile in enumerate(row):
+                        if [x,y] == scientist_data:
+                            display.blit(scientist_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - scientist_img.get_width()) // 2, 100 + x * 5 + y * 5 - scientist_img.get_height() + 15))
             
-            # spawn dinosaurs
+            # show dinosaurs
             for y, row in enumerate(map_data):
                 for x, tile in enumerate(row):
                     if [x,y] == dino_data:
@@ -176,5 +212,8 @@ def main():
             pygame.display.flip()
 
             time.sleep(1)
+
+    pygame.quit()
+    sys.exit()
 
 main()
