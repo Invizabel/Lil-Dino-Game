@@ -33,7 +33,6 @@ def main():
     cursor_up = False
     flask = 0
     pause_menu = False
-    scientist = False
     scientist_x = 11
     scientist_y = 11
     timer = 0
@@ -56,9 +55,6 @@ def main():
                 if event.key == K_SPACE:
                     if cursor == 0:
                         pause_menu = False
-                        
-                    if cursor == 1:
-                        scientist = True
 
                 if event.key == K_DOWN:
                     cursor_down = True
@@ -74,7 +70,7 @@ def main():
                     cursor_up = False
 
         if pause_menu:
-            if cursor_down and cursor < 2:
+            if cursor_down and cursor < 1:
                 cursor += 1
                 cursor_down = False
 
@@ -84,24 +80,16 @@ def main():
 
             if cursor == 0:
                 resume_text = my_font.render("resume", True, "red")
-                scientist_text = my_font.render("hire scientist", True, "blue")
                 market_text = my_font.render("goto market", True, "blue")
 
             elif cursor == 1:
                 resume_text = my_font.render("resume", True, "blue")
-                scientist_text = my_font.render("hire scientist", True, "red")
-                market_text = my_font.render("goto market", True, "blue")
-
-            elif cursor == 2:
-                resume_text = my_font.render("resume", True, "blue")
-                scientist_text = my_font.render("hire scientist", True, "blue")
                 market_text = my_font.render("goto market", True, "red")
 
             research_text = my_small_font.render(f"research points: {flask}", True, "yellow")
 
             screen.blit(resume_text, (200,0))
-            screen.blit(scientist_text, (75,100))
-            screen.blit(market_text, (100,200))
+            screen.blit(market_text, (75,100))
             screen.blit(research_text, (25,400))
             pygame.display.flip()
             
@@ -138,7 +126,7 @@ def main():
                 dino_data[1] += 1
 
             # scientist ai
-            if len(poop_data) > 0 and scientist:
+            if len(poop_data) > 0:
                 if poop_data[0][0] < scientist_data[0]:
                     scientist_data[0] -= 1
                 elif poop_data[0][1] < scientist_data[1]:
@@ -151,7 +139,7 @@ def main():
                     poop_data.pop(0)
                     flask += 1
 
-            elif len(poop_data) == 0 and scientist:
+            elif len(poop_data) == 0:
                 direction = random.randint(1,4)
 
                 if scientist_data[0] == 0 and scientist_data[1] == 11:
@@ -196,11 +184,10 @@ def main():
                             display.blit(poop_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - poop_img.get_width()) // 2, 100 + x * 5 + y * 5 - poop_img.get_height() + 15))
 
             # show scientist
-            if scientist:
-                for y, row in enumerate(map_data):
-                    for x, tile in enumerate(row):
-                        if [x,y] == scientist_data:
-                            display.blit(scientist_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - scientist_img.get_width()) // 2, 100 + x * 5 + y * 5 - scientist_img.get_height() + 15))
+            for y, row in enumerate(map_data):
+                for x, tile in enumerate(row):
+                    if [x,y] == scientist_data:
+                        display.blit(scientist_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - scientist_img.get_width()) // 2, 100 + x * 5 + y * 5 - scientist_img.get_height() + 15))
             
             # show dinosaurs
             for y, row in enumerate(map_data):
