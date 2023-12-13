@@ -11,9 +11,10 @@ def main():
     display = pygame.Surface((300, 300))
 
     cursor_img = pygame.image.load("assets/cursor.png").convert_alpha()
+    fence_img = pygame.image.load("assets/fence.png").convert_alpha()
     grass_img = pygame.image.load("assets/grass.png").convert_alpha()
+    keeper_img = pygame.image.load("assets/dino_keeper.png").convert_alpha()
     poop_img = pygame.image.load("assets/poop.png").convert_alpha()
-    scientist_img = pygame.image.load("assets/dino_keeper.png").convert_alpha()
     triceratops_img = pygame.image.load("assets/triceratops.png").convert_alpha()
     trex_img = pygame.image.load("assets/trex.png").convert_alpha()
     pygame.font.init()
@@ -22,12 +23,26 @@ def main():
     grass_img.set_colorkey((0, 0, 0))
     pygame.mouse.set_visible(False)
 
+    # generate map data
     map_data = []
     for x in range(12):
         new_map_data = []
         for y in range(12):
             new_map_data.append(1)
         map_data.append(new_map_data)
+
+    # generate fence data
+    fence_data = []
+    for x in range(12):
+        new_fence_data = []
+        for y in range(12):
+            if y == 6 and x <= 6:
+                new_fence_data.append(1)
+            elif x == 6 and y <= 6:
+                new_fence_data.append(1)
+            else:
+                new_fence_data.append(0)
+        fence_data.append(new_fence_data)
 
     dino_keeper = False
     dino_x = 0
@@ -38,14 +53,14 @@ def main():
     flask = 0
     main_menu = True
     pause_menu = False
-    scientist_x = 11
-    scientist_y = 11
+    keeper_x = 0
+    keeper_y = 0
     timer = 0
 
     dino_data = []
     player_data = [0,0]
     poop_data = []
-    scientist_data = [scientist_x,scientist_y]
+    keeper_data = [keeper_x,keeper_y]
 
     player_up = False
     player_down = False
@@ -226,7 +241,7 @@ def main():
                 player_data[1] -= 1
                 player_up = False
 
-            if player_down and player_data[1] < 11:
+            if player_down and player_data[1] < 5:
                 player_data[1] += 1
                 player_down = False
 
@@ -234,73 +249,67 @@ def main():
                 player_data[0] -= 1
                 player_left = False
 
-            if player_right and player_data[0] < 11:
+            if player_right and player_data[0] < 5:
                 player_data[0] += 1
                 player_right = False
-                    
-            # draw terrain
-            for y, row in enumerate(map_data):
-                for x, tile in enumerate(row):
-                    if tile:
-                        display.blit(grass_img, (150 + x * 10 - y * 10, 100 + x * 5 + y * 5))
 
             if move_ai:
                 # dino ai
                 direction = random.randint(1,4)
                 for dino in dino_data:
-                    if dino[0] == 0 and dino[1] == 11:
+                    if dino[0] == 0 and dino[1] == 5:
                         dino[1] -= 1
 
-                    if dino[1] == 0 and dino[0] == 11:
+                    if dino[1] == 0 and dino[0] == 5:
                         dino[0] -= 1
 
                     if direction == 1 and dino[0] > 0 and dino[1] > 0:
                         dino[0] -= 1
 
-                    if direction == 2 and dino[0] < 11 and dino[1] < 11:
+                    if direction == 2 and dino[0] < 5 and dino[1] < 5:
                         dino[0] += 1
 
                     if direction == 3 and dino[0] > 0 and dino[1] > 0:
                         dino[1] -= 1
 
-                    if direction == 4 and dino[0] < 11 and dino[1] < 11:
+                    if direction == 4 and dino[0] < 5 and dino[1] < 5:
                         dino[1] += 1
 
                 if dino_keeper:
                     # dino keeper ai
                     if len(poop_data) > 0:
-                        if poop_data[0][0] < scientist_data[0]:
-                            scientist_data[0] -= 1
-                        elif poop_data[0][1] < scientist_data[1]:
-                            scientist_data[1] -= 1
-                        elif poop_data[0][0] > scientist_data[0]:
-                            scientist_data[0] += 1
-                        elif poop_data[0][1] > scientist_data[1]:
-                            scientist_data[1] += 1
-                        elif list(poop_data[0]) == scientist_data and len(poop_data) > 0:
+                        if poop_data[0][0] < keeper_data[0]:
+                            keeper_data[0] -= 1
+                        elif poop_data[0][1] < keeper_data[1]:
+                            keeper_data[1] -= 1
+                        elif poop_data[0][0] > keeper_data[0]:
+                            keeper_data[0] += 1
+                        elif poop_data[0][1] > keeper_data[1]:
+                            keeper_data[1] += 1
+                        elif list(poop_data[0]) == keeper_data and len(poop_data) > 0:
                             poop_data.pop(0)
                             flask += 1
 
                     elif len(poop_data) == 0:
                         direction = random.randint(1,4)
 
-                        if scientist_data[0] == 0 and scientist_data[1] == 11:
-                            scientist_data[1] -= 1
+                        if keeper_data[0] == 0 and keeper_data[1] == 5:
+                            keeper_data[1] -= 1
 
-                        if scientist_data[1] == 0 and scientist_data[0] == 11:
-                            scientist_data[0] -= 1
+                        if keeper_data[1] == 0 and keeper_data[0] == 5:
+                            keeper_data[0] -= 1
 
-                        if direction == 1 and scientist_data[0] > 0 and scientist_data[1] > 0:
-                            scientist_data[0] -= 1
+                        if direction == 1 and keeper_data[0] > 0 and keeper_data[1] > 0:
+                            keeper_data[0] -= 1
 
-                        if direction == 2 and scientist_data[0] < 11 and scientist_data[1] < 11:
-                            scientist_data[0] += 1
+                        if direction == 2 and keeper_data[0] < 5 and keeper_data[1] < 5:
+                            keeper_data[0] += 1
 
-                        if direction == 3 and scientist_data[0] > 0 and scientist_data[1] > 0:
-                            scientist_data[1] -= 1
+                        if direction == 3 and keeper_data[0] > 0 and keeper_data[1] > 0:
+                            keeper_data[1] -= 1
 
-                        if direction == 4 and scientist_data[0] < 11 and scientist_data[1] < 11:
-                            scientist_data[1] += 1
+                        if direction == 4 and keeper_data[0] < 5 and keeper_data[1] < 5:
+                            keeper_data[1] += 1
 
                 # poop
                 for dino in dino_data:
@@ -313,7 +322,18 @@ def main():
                                 break
                         if not already_pooped:
                             poop_data.append((dino[0],dino[1]))
-            
+            # draw terrain
+            for y, row in enumerate(map_data):
+                for x, tile in enumerate(row):
+                    if tile:
+                        display.blit(grass_img, (150 + x * 10 - y * 10, 100 + x * 5 + y * 5))
+
+            # draw fences
+            for y, row in enumerate(fence_data):
+                for x, tile in enumerate(row):
+                    if tile:
+                        display.blit(fence_img, (150 + x * 10 - y * 10, 100 + x * 5 + y * 5))
+                        
             # draw research points
             research_text = my_small_font.render(f"research points: {flask}", True, "yellow")
             display.blit(research_text, (25,25))
@@ -329,8 +349,8 @@ def main():
             if dino_keeper:
                 for y, row in enumerate(map_data):
                     for x, tile in enumerate(row):
-                        if [x,y] == scientist_data:
-                            display.blit(scientist_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - scientist_img.get_width()) // 2, 100 + x * 5 + y * 5 - scientist_img.get_height() + 15))
+                        if [x,y] == keeper_data:
+                            display.blit(keeper_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - keeper_img.get_width()) // 2, 100 + x * 5 + y * 5 - keeper_img.get_height() + 15))
             
             # draw dinosaurs
             for y, row in enumerate(map_data):
