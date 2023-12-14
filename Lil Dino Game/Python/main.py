@@ -34,7 +34,7 @@ def main():
 
     # load sounds
     pygame.mixer.music.load("assets/sounds/main_1.mp3")
-    pygame.mixer.music.play(-1)
+    #pygame.mixer.music.play(-1)
 
     keeper_img = pygame.transform.scale(keeper_img, (16, 16))
     janitor_img = pygame.transform.scale(janitor_img, (16, 16))
