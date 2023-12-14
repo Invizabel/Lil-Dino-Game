@@ -462,7 +462,7 @@ def main():
 
                 # poop
                 for dino in dino_data:
-                    poop = random.randint(1,75)
+                    poop = random.randint(1,30)
                     if poop == 1:
                         special_poop = random.randint(1,1000)
                         already_pooped = False
