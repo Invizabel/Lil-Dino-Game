@@ -65,14 +65,15 @@ def main():
     timer = 0
   
     main_menu = True
-   
     pause_menu = False
     market_menu = False
 
     dino_data = []
+    keeper_data = [keeper_x,keeper_y]
+    pizza_data = []
     player_data = [0,0]
     poop_data = []
-    keeper_data = [keeper_x,keeper_y]
+    soda_data = []
 
     player_up = False
     player_down = False
@@ -101,10 +102,10 @@ def main():
                     if main_menu:
                         main_menu = False
                         if cursor == 0:
-                            dino_data.append([dino_x,dino_y, "triceratops"])
+                            dino_data.append([dino_x, dino_y, "triceratops"])
 
                         elif cursor == 1:
-                            dino_data.append([dino_x,dino_y, "trex"])
+                            dino_data.append([dino_x, dino_y, "trex"])
 
                         elif cursor == 2:
                             pygame.quit()
@@ -147,26 +148,32 @@ def main():
                         cursor = 0
 
                     else:
-                        for count, terd in enumerate(poop_data):
-                            if terd[0] == player_data[0] and terd[1] == player_data[1] and terd[2]:
-                                poop_data.pop(count)
-                                flask += 100
-                                break
-                            elif terd[0] == player_data[0] and terd[1] == player_data[1] and not terd[2]:
-                                poop_data.pop(count)
-                                flask += 1
-                                break
+                        if player_data[0] > 6 and pizza_stand or player_data[1] > 6 and pizza_stand:
+                            pizza_data.append([player_data[0],player_data[1]])
+                            pizza_stand = False
                             
+                        else:
+                            for count, terd in enumerate(poop_data):
+                                if terd[0] == player_data[0] and terd[1] == player_data[1] and terd[2]:
+                                    poop_data.pop(count)
+                                    flask += 100
+                                    break
+
+                                elif terd[0] == player_data[0] and terd[1] == player_data[1] and not terd[2]:
+                                    poop_data.pop(count)
+                                    flask += 1
+                                    break
+                                
                 if event.key == K_UP or event.key == K_w:
                     if main_menu or pause_menu or market_menu:
                         cursor_up = True
-
+                        
                     else:
                         player_up = True
                         player_down = False
                         player_left = False
                         player_right = False
-    
+                        
                 if event.key == K_DOWN or event.key == K_s:
                     if main_menu or pause_menu or market_menu:
                         cursor_down = True
@@ -450,6 +457,14 @@ def main():
                         if [x, y, "trex"] == dino:
                             display.blit(trex_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - trex_img.get_width()) // 2, 100 + x * 5 + y * 5 - trex_img.get_height() + 15))
 
+            # draw pizza stands
+            for y, row in enumerate(map_data):
+                for x, tile in enumerate(row):
+                    for food in pizza_data:
+                        if food[0] == x and food[1] == y:
+                            display.blit(pizza_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - pizza_img.get_width()) // 2, 100 + x * 5 + y * 5 - pizza_img.get_height() + 15))
+                            break
+
             # draw cursor
             for y, row in enumerate(map_data):
                 for x, tile in enumerate(row):
@@ -457,7 +472,7 @@ def main():
                         display.blit(cursor_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - cursor_img.get_width()) // 2, 100 + x * 5 + y * 5 - cursor_img.get_height() + 15))
                         if pizza_stand:
                             display.blit(pizza_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - pizza_img.get_width()) // 2, 100 + x * 5 + y * 5 - pizza_img.get_height() + 15))
-
+                            
                         if soda_stand:
                             display.blit(soda_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - soda_img.get_width()) // 2, 100 + x * 5 + y * 5 - soda_img.get_height() + 15))
 
