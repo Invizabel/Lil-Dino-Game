@@ -162,12 +162,36 @@ def main():
 
                     else:
                         if player_data[0] > 6 and pizza_stand or player_data[1] > 6 and pizza_stand:
-                            pizza_data.append([player_data[0],player_data[1]])
-                            pizza_stand = False
+                            dont_place = False
+                            if len(pizza_data) > 0:
+                                for food in pizza_data:
+                                    if food[0] == player_data[0] and food[1] == player_data[1]:
+                                        dont_place = True
+                            
+                            if len(soda_data) > 0:
+                                for food in soda_data:
+                                    if food[0] == player_data[0] and food[1] == player_data[1]:
+                                        dont_place = True
+
+                            if not dont_place:
+                                pizza_data.append([player_data[0],player_data[1]])
+                                pizza_stand = False
 
                         elif player_data[0] > 6 and soda_stand or player_data[1] > 6 and soda_stand:
-                            soda_data.append([player_data[0],player_data[1]])
-                            soda_stand = False
+                            dont_place = False
+                            if len(pizza_data) > 0:
+                                for food in pizza_data:
+                                    if food[0] == player_data[0] and food[1] == player_data[1]:
+                                        dont_place = True
+                            
+                            if len(soda_data) > 0:
+                                for food in soda_data:
+                                    if food[0] == player_data[0] and food[1] == player_data[1]:
+                                        dont_place = True
+
+                            if not dont_place:
+                                soda_data.append([player_data[0],player_data[1]])
+                                soda_stand = False
                             
                         else:
                             for count, terd in enumerate(poop_data):
