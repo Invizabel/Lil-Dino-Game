@@ -8,24 +8,36 @@ def main():
     pygame.init()
     pygame.display.set_caption("Lil Dino Game")
     size = pygame.display.Info()
-    screen = pygame.display.set_mode((640, 480), pygame.FULLSCREEN)
+    # dev mode
+    screen = pygame.display.set_mode((640, 480), 0 ,32)
+    # production
+    #screen = pygame.display.set_mode((640, 480), pygame.FULLSCREEN)
     display = pygame.Surface((300, 300))
 
-    cursor_img = pygame.image.load("assets/cursor.png").convert_alpha()
-    fence_img = pygame.image.load("assets/fence.png").convert_alpha()
-    grass_img = pygame.image.load("assets/grass.png").convert_alpha()
-    keeper_img = pygame.image.load("assets/dino_keeper.png").convert_alpha()
-    pizza_img = pygame.image.load("assets/pizza.png").convert_alpha()
-    poop_img = pygame.image.load("assets/poop.png").convert_alpha()
-    rainbow_poop_img = pygame.image.load("assets/rainbow_poop.png").convert_alpha()
-    soda_img = pygame.image.load("assets/soda.png").convert_alpha()
-    triceratops_img = pygame.image.load("assets/triceratops.png").convert_alpha()
-    trex_img = pygame.image.load("assets/trex.png").convert_alpha()
+    # load images
+    cursor_img = pygame.image.load("assets/images/cursor.png").convert_alpha()
+    fence_img = pygame.image.load("assets/images/fence.png").convert_alpha()
+    grass_img = pygame.image.load("assets/images/grass.png").convert_alpha()
+    keeper_img = pygame.image.load("assets/images/dino_keeper.png").convert_alpha()
+    janitor_img = pygame.image.load("assets/images/janitor.png").convert_alpha()
+    pizza_img = pygame.image.load("assets/images/pizza.png").convert_alpha()
+    poop_img = pygame.image.load("assets/images/poop.png").convert_alpha()
+    rainbow_poop_img = pygame.image.load("assets/images/rainbow_poop.png").convert_alpha()
+    soda_img = pygame.image.load("assets/images/soda.png").convert_alpha()
+    triceratops_img = pygame.image.load("assets/images/triceratops.png").convert_alpha()
+    trex_img = pygame.image.load("assets/images/trex.png").convert_alpha()
     pygame.font.init()
     my_font = pygame.font.SysFont("times new roman", 50)
     my_small_font = pygame.font.SysFont("times new roman", 25)
     grass_img.set_colorkey((0, 0, 0))
     pygame.mouse.set_visible(False)
+
+    # load sounds
+    pygame.mixer.music.load("assets/sounds/main_1.mp3")
+    pygame.mixer.music.play(-1)
+
+    keeper_img = pygame.transform.scale(keeper_img, (16, 16))
+    janitor_img = pygame.transform.scale(janitor_img, (16, 16))
 
     # generate map data
     map_data = []
@@ -59,8 +71,7 @@ def main():
     cursor_down = False
     cursor_up = False
     flask = 100
-    keeper_x = 0
-    keeper_y = 0
+    janitor = True
     pizza_stand = False
     soda_stand = False
     timer = 0
@@ -70,7 +81,8 @@ def main():
     market_menu = False
 
     dino_data = []
-    keeper_data = [keeper_x,keeper_y]
+    janitor_data = [11, 11]
+    keeper_data = [0, 0]
     pizza_data = []
     player_data = [0,0]
     poop_data = []
@@ -161,12 +173,12 @@ def main():
                             for count, terd in enumerate(poop_data):
                                 if terd[0] == player_data[0] and terd[1] == player_data[1] and terd[2]:
                                     poop_data.pop(count)
-                                    flask += 100
+                                    #flask += 100
                                     break
 
                                 elif terd[0] == player_data[0] and terd[1] == player_data[1] and not terd[2]:
                                     poop_data.pop(count)
-                                    flask += 1
+                                    #flask += 1
                                     break
                                 
                 if event.key == K_UP or event.key == K_w:
@@ -373,13 +385,15 @@ def main():
 
                         elif poop_data[0][0] == keeper_data[0] and poop_data[0][1] == keeper_data[1] and len(poop_data) > 0:
                             if poop_data[0][2]:
-                                flask += 100
+                                pass
+                                #flask += 100
 
                             else:
-                                flask += 1
+                                pass
+                                #flask += 1
+
                             poop_data.pop(0)
                             
-
                     elif len(poop_data) == 0:
                         direction = random.randint(1,4)
 
@@ -400,6 +414,27 @@ def main():
 
                         if direction == 4 and keeper_data[0] < 5 and keeper_data[1] < 5:
                             keeper_data[1] += 1
+
+                if janitor:
+                    direction = random.randint(1,4)
+
+                    if janitor_data[0] == 0 and janitor_data[1] == 5:
+                        janitor_data[1] -= 1
+
+                    if janitor_data[1] == 0 and janitor_data[0] == 5:
+                        janitor_data[0] -= 1
+
+                    if direction == 1 and janitor_data[0] > 5 and janitor_data[1] > 5:
+                        janitor_data[0] -= 1
+
+                    if direction == 2 and janitor_data[0] < 11 and janitor_data[1] < 11:
+                        janitor_data[0] += 1
+
+                    if direction == 3 and janitor_data[0] > 5 and janitor_data[1] > 5:
+                        janitor_data[1] -= 1
+
+                    if direction == 4 and janitor_data[0] < 11 and janitor_data[1] < 11:
+                        janitor_data[1] += 1
 
                 # poop
                 for dino in dino_data:
@@ -453,6 +488,13 @@ def main():
                     for x, tile in enumerate(row):
                         if [x, y] == keeper_data:
                             display.blit(keeper_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - keeper_img.get_width()) // 2, 100 + x * 5 + y * 5 - keeper_img.get_height() + 15))
+
+            # draw janitor
+            if janitor:
+                for y, row in enumerate(map_data):
+                    for x, tile in enumerate(row):
+                        if [x, y] == janitor_data:
+                            display.blit(janitor_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - janitor_img.get_width()) // 2, 100 + x * 5 + y * 5 - janitor_img.get_height() + 15))
             
             # draw dinosaurs
             for y, row in enumerate(map_data):
