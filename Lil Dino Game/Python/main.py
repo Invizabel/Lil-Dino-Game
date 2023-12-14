@@ -94,13 +94,6 @@ def main():
     player_right = False
 
     while True:
-        # timer
-        timer += 1
-        move_ai = False
-        if timer == 10:
-            timer = 0
-            move_ai = True
-
         screen.fill("black")
         display.fill("black")
         for event in pygame.event.get():
@@ -353,6 +346,13 @@ def main():
             
             
         else:
+            # timer
+            timer += 1
+            move_ai = False
+            if timer == 5:
+                timer = 0
+                move_ai = True
+
             # player
             if player_up and player_data[1] > 0:
                 player_data[1] -= 1
@@ -442,10 +442,10 @@ def main():
                 if janitor:
                     direction = random.randint(1,4)
 
-                    if janitor_data[0] == 0 and janitor_data[1] == 5:
+                    if janitor_data[0] == 5 and janitor_data[1] == 11:
                         janitor_data[1] -= 1
 
-                    if janitor_data[1] == 0 and janitor_data[0] == 5:
+                    if janitor_data[1] == 5 and janitor_data[0] == 11:
                         janitor_data[0] -= 1
 
                     if direction == 1 and janitor_data[0] > 5 and janitor_data[1] > 5:
@@ -462,7 +462,7 @@ def main():
 
                 # poop
                 for dino in dino_data:
-                    poop = random.randint(1,15)
+                    poop = random.randint(1,75)
                     if poop == 1:
                         special_poop = random.randint(1,1000)
                         already_pooped = False
