@@ -15,6 +15,7 @@ def main():
     grass_img = pygame.image.load("assets/grass.png").convert_alpha()
     keeper_img = pygame.image.load("assets/dino_keeper.png").convert_alpha()
     poop_img = pygame.image.load("assets/poop.png").convert_alpha()
+    rainbow_poop_img = pygame.image.load("assets/rainbow_poop.png").convert_alpha()
     triceratops_img = pygame.image.load("assets/triceratops.png").convert_alpha()
     trex_img = pygame.image.load("assets/trex.png").convert_alpha()
     pygame.font.init()
@@ -116,7 +117,11 @@ def main():
 
                     else:
                         for count,terd in enumerate(poop_data):
-                            if list(terd) == player_data:
+                            if terd[0] == player_data[0] and terd[1] == player_data[1] and terd[2]:
+                                poop_data.pop(count)
+                                flask += 100
+                                break
+                            elif terd[0] == player_data[0] and terd[1] == player_data[1] and not terd[2]:
                                 poop_data.pop(count)
                                 flask += 1
                                 break
@@ -286,9 +291,13 @@ def main():
                             keeper_data[0] += 1
                         elif poop_data[0][1] > keeper_data[1]:
                             keeper_data[1] += 1
-                        elif list(poop_data[0]) == keeper_data and len(poop_data) > 0:
+                        elif poop_data[0][0] == keeper_data[0] and poop_data[0][1] == keeper_data[1] and len(poop_data) > 0:
+                            if poop_data[0][2]:
+                                flask += 100
+                            else:
+                                flask += 1
                             poop_data.pop(0)
-                            flask += 1
+                            
 
                     elif len(poop_data) == 0:
                         direction = random.randint(1,4)
@@ -315,13 +324,18 @@ def main():
                 for dino in dino_data:
                     poop = random.randint(1,15)
                     if poop == 1:
+                        special_poop = random.randint(1,1000)
                         already_pooped = False
                         for terd in poop_data:
                             if terd == dino:
                                 already_pooped = True
                                 break
                         if not already_pooped:
-                            poop_data.append((dino[0],dino[1]))
+                            if special_poop == 1:
+                                poop_data.append([dino[0],dino[1],True])
+                            else:
+                                poop_data.append([dino[0],dino[1],False])
+                                
             # draw terrain
             for y, row in enumerate(map_data):
                 for x, tile in enumerate(row):
@@ -342,7 +356,10 @@ def main():
             for y, row in enumerate(map_data):
                 for x, tile in enumerate(row):
                     for terd in poop_data:
-                        if x == terd[0] and y == terd[1]:
+                        if x == terd[0] and y == terd[1] and terd[2] == True:
+                            display.blit(rainbow_poop_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - poop_img.get_width()) // 2, 100 + x * 5 + y * 5 - poop_img.get_height() + 15))
+
+                        elif  x == terd[0] and y == terd[1] and terd[2] == False:
                             display.blit(poop_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - poop_img.get_width()) // 2, 100 + x * 5 + y * 5 - poop_img.get_height() + 15))
 
             # draw dino keeper
