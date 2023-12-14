@@ -7,7 +7,8 @@ from pygame.locals import *
 def main():
     pygame.init()
     pygame.display.set_caption("Lil Dino Game")
-    screen = pygame.display.set_mode((640, 480),0,32)
+    size = pygame.display.Info()
+    screen = pygame.display.set_mode((640, 480), pygame.FULLSCREEN)
     display = pygame.Surface((300, 300))
 
     cursor_img = pygame.image.load("assets/cursor.png").convert_alpha()
@@ -151,6 +152,10 @@ def main():
                         if player_data[0] > 6 and pizza_stand or player_data[1] > 6 and pizza_stand:
                             pizza_data.append([player_data[0],player_data[1]])
                             pizza_stand = False
+
+                        elif player_data[0] > 6 and soda_stand or player_data[1] > 6 and soda_stand:
+                            soda_data.append([player_data[0],player_data[1]])
+                            soda_stand = False
                             
                         else:
                             for count, terd in enumerate(poop_data):
@@ -436,9 +441,11 @@ def main():
                     for terd in poop_data:
                         if x == terd[0] and y == terd[1] and terd[2] == True:
                             display.blit(rainbow_poop_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - poop_img.get_width()) // 2, 100 + x * 5 + y * 5 - poop_img.get_height() + 15))
+                            break
 
                         elif  x == terd[0] and y == terd[1] and terd[2] == False:
                             display.blit(poop_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - poop_img.get_width()) // 2, 100 + x * 5 + y * 5 - poop_img.get_height() + 15))
+                            break
 
             # draw dino keeper
             if dino_keeper:
@@ -458,12 +465,22 @@ def main():
                             display.blit(trex_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - trex_img.get_width()) // 2, 100 + x * 5 + y * 5 - trex_img.get_height() + 15))
 
             # draw pizza stands
-            for y, row in enumerate(map_data):
-                for x, tile in enumerate(row):
-                    for food in pizza_data:
-                        if food[0] == x and food[1] == y:
-                            display.blit(pizza_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - pizza_img.get_width()) // 2, 100 + x * 5 + y * 5 - pizza_img.get_height() + 15))
-                            break
+            if len(pizza_data) > 0:
+                for y, row in enumerate(map_data):
+                    for x, tile in enumerate(row):
+                        for food in pizza_data:
+                            if food[0] == x and food[1] == y:
+                                display.blit(pizza_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - pizza_img.get_width()) // 2, 100 + x * 5 + y * 5 - pizza_img.get_height() + 15))
+                                break
+
+            # draw soda stands
+            if len(soda_data) > 0:
+                for y, row in enumerate(map_data):
+                    for x, tile in enumerate(row):
+                        for food in soda_data:
+                            if food[0] == x and food[1] == y:
+                                display.blit(soda_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - soda_img.get_width()) // 2, 100 + x * 5 + y * 5 - soda_img.get_height() + 15))
+                                break
 
             # draw cursor
             for y, row in enumerate(map_data):
