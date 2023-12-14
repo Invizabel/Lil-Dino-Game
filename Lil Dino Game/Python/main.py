@@ -14,12 +14,14 @@ def main():
     fence_img = pygame.image.load("assets/fence.png").convert_alpha()
     grass_img = pygame.image.load("assets/grass.png").convert_alpha()
     keeper_img = pygame.image.load("assets/dino_keeper.png").convert_alpha()
+    pizza_img = pygame.image.load("assets/pizza.png").convert_alpha()
     poop_img = pygame.image.load("assets/poop.png").convert_alpha()
     rainbow_poop_img = pygame.image.load("assets/rainbow_poop.png").convert_alpha()
+    soda_img = pygame.image.load("assets/soda.png").convert_alpha()
     triceratops_img = pygame.image.load("assets/triceratops.png").convert_alpha()
     trex_img = pygame.image.load("assets/trex.png").convert_alpha()
     pygame.font.init()
-    my_font = pygame.font.SysFont("times new roman", 75)
+    my_font = pygame.font.SysFont("times new roman", 50)
     my_small_font = pygame.font.SysFont("times new roman", 25)
     grass_img.set_colorkey((0, 0, 0))
     pygame.mouse.set_visible(False)
@@ -30,6 +32,7 @@ def main():
         new_map_data = []
         for y in range(12):
             new_map_data.append(1)
+
         map_data.append(new_map_data)
 
     # generate fence data
@@ -39,10 +42,13 @@ def main():
         for y in range(12):
             if y == 6 and x <= 6:
                 new_fence_data.append(1)
+
             elif x == 6 and y <= 6:
                 new_fence_data.append(1)
+
             else:
                 new_fence_data.append(0)
+
         fence_data.append(new_fence_data)
 
     dino_keeper = False
@@ -51,12 +57,17 @@ def main():
     cursor = 0
     cursor_down = False
     cursor_up = False
-    flask = 0
-    main_menu = True
-    pause_menu = False
+    flask = 100
     keeper_x = 0
     keeper_y = 0
+    pizza_stand = False
+    soda_stand = False
     timer = 0
+  
+    main_menu = True
+   
+    pause_menu = False
+    market_menu = False
 
     dino_data = []
     player_data = [0,0]
@@ -90,10 +101,10 @@ def main():
                     if main_menu:
                         main_menu = False
                         if cursor == 0:
-                            dino_data.append([dino_x,dino_y,"triceratops"])
+                            dino_data.append([dino_x,dino_y, "triceratops"])
 
                         elif cursor == 1:
-                            dino_data.append([dino_x,dino_y,"trex"])
+                            dino_data.append([dino_x,dino_y, "trex"])
 
                         elif cursor == 2:
                             pygame.quit()
@@ -109,14 +120,34 @@ def main():
                             dino_keeper = True
                             pause_menu = False
 
+                        if cursor == 2:
+                            market_menu = True
+                            pause_menu = False
+
                         elif cursor == 3:
                             pygame.quit()
                             sys.exit()
 
                         cursor = 0
 
+                    elif market_menu:
+                        if cursor == 0:
+                            market_menu = False
+
+                        if cursor == 1 and flask >= 25:
+                            pizza_stand = True
+                            market_menu = False
+                            flask -= 25
+
+                        if cursor == 2 and flask >= 25:
+                            soda_stand = True
+                            market_menu = False
+                            flask -= 25
+
+                        cursor = 0
+
                     else:
-                        for count,terd in enumerate(poop_data):
+                        for count, terd in enumerate(poop_data):
                             if terd[0] == player_data[0] and terd[1] == player_data[1] and terd[2]:
                                 poop_data.pop(count)
                                 flask += 100
@@ -127,7 +158,7 @@ def main():
                                 break
                             
                 if event.key == K_UP or event.key == K_w:
-                    if main_menu or pause_menu:
+                    if main_menu or pause_menu or market_menu:
                         cursor_up = True
 
                     else:
@@ -137,7 +168,7 @@ def main():
                         player_right = False
     
                 if event.key == K_DOWN or event.key == K_s:
-                    if main_menu or pause_menu:
+                    if main_menu or pause_menu or market_menu:
                         cursor_down = True
 
                     else:
@@ -159,12 +190,12 @@ def main():
                     player_right = True
 
             if event.type == KEYUP:
-                if event.key == K_UP or event.key == K_w:
+                if event.key == K_UP or event.key == K_w or market_menu:
                     if main_menu or pause_menu:
                         cursor_up = False
     
                 if event.key == K_DOWN or event.key == K_s:
-                    if main_menu or pause_menu:
+                    if main_menu or pause_menu or market_menu:
                         cursor_down = False
 
         if main_menu:
@@ -193,9 +224,9 @@ def main():
 
             research_text = my_small_font.render(f"research points: {flask}", True, "yellow")
 
-            screen.blit(triceratops_text, (150,0))
-            screen.blit(trex_text, (250,75))
-            screen.blit(exit_text, (150,150))
+            screen.blit(triceratops_text, (225, 0))
+            screen.blit(trex_text, (275, 75))
+            screen.blit(exit_text, (225, 150))
             pygame.display.flip()
         
         elif pause_menu:
@@ -233,12 +264,45 @@ def main():
 
             research_text = my_small_font.render(f"research points: {flask}", True, "yellow")
 
-            screen.blit(resume_text, (225,0))
-            screen.blit(keeper_text, (75,75))
-            screen.blit(market_text, (125,150))
-            screen.blit(exit_text, (175,225))
-            screen.blit(research_text, (75,400))
+            screen.blit(resume_text, (250, 0))
+            screen.blit(keeper_text, (150, 75))
+            screen.blit(market_text, (200, 150))
+            screen.blit(exit_text, (225, 225))
+            screen.blit(research_text, (75, 400))
             pygame.display.flip()
+
+        elif market_menu:
+            if cursor_down and cursor < 2:
+                cursor += 1
+                cursor_down = False
+
+            if cursor_up and cursor > 0:
+                cursor -= 1
+                cursor_up = False
+
+            if cursor == 0:
+                resume_text = my_font.render("resume", True, "red")
+                pizza_text = my_font.render("pizza stand | 25 research", True, "blue")
+                soda_text = my_font.render("soda stand | 25 research", True, "blue")
+
+            elif cursor == 1:
+                resume_text = my_font.render("resume", True, "blue")
+                pizza_text = my_font.render("pizza stand | 25 research", True, "red")
+                soda_text = my_font.render("soda stand | 25 research", True, "blue")
+
+            elif cursor == 2:
+                resume_text = my_font.render("resume", True, "blue")
+                pizza_text = my_font.render("pizza stand | 25 research", True, "blue")
+                soda_text = my_font.render("soda stand | 25 research", True, "red")
+
+            research_text = my_small_font.render(f"research points: {flask}", True, "yellow")
+
+            screen.blit(resume_text, (250, 0))
+            screen.blit(pizza_text, (100, 75))
+            screen.blit(soda_text, (100, 150))
+            screen.blit(research_text, (75, 400))
+            pygame.display.flip()
+            
             
         else:
             # player
@@ -246,7 +310,7 @@ def main():
                 player_data[1] -= 1
                 player_up = False
 
-            if player_down and player_data[1] < 5:
+            if player_down and player_data[1] < 11:
                 player_data[1] += 1
                 player_down = False
 
@@ -254,7 +318,7 @@ def main():
                 player_data[0] -= 1
                 player_left = False
 
-            if player_right and player_data[0] < 5:
+            if player_right and player_data[0] < 11:
                 player_data[0] += 1
                 player_right = False
 
@@ -285,15 +349,20 @@ def main():
                     if len(poop_data) > 0:
                         if poop_data[0][0] < keeper_data[0]:
                             keeper_data[0] -= 1
+
                         elif poop_data[0][1] < keeper_data[1]:
                             keeper_data[1] -= 1
+
                         elif poop_data[0][0] > keeper_data[0]:
                             keeper_data[0] += 1
+
                         elif poop_data[0][1] > keeper_data[1]:
                             keeper_data[1] += 1
+
                         elif poop_data[0][0] == keeper_data[0] and poop_data[0][1] == keeper_data[1] and len(poop_data) > 0:
                             if poop_data[0][2]:
                                 flask += 100
+
                             else:
                                 flask += 1
                             poop_data.pop(0)
@@ -330,11 +399,13 @@ def main():
                             if terd == dino:
                                 already_pooped = True
                                 break
+
                         if not already_pooped:
                             if special_poop == 1:
-                                poop_data.append([dino[0],dino[1],True])
+                                poop_data.append([dino[0], dino[1], True])
+
                             else:
-                                poop_data.append([dino[0],dino[1],False])
+                                poop_data.append([dino[0], dino[1], False])
                                 
             # draw terrain
             for y, row in enumerate(map_data):
@@ -350,7 +421,7 @@ def main():
                         
             # draw research points
             research_text = my_small_font.render(f"research points: {flask}", True, "yellow")
-            display.blit(research_text, (25,25))
+            display.blit(research_text, (25, 25))
 
             # draw poop B)
             for y, row in enumerate(map_data):
@@ -366,24 +437,29 @@ def main():
             if dino_keeper:
                 for y, row in enumerate(map_data):
                     for x, tile in enumerate(row):
-                        if [x,y] == keeper_data:
+                        if [x, y] == keeper_data:
                             display.blit(keeper_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - keeper_img.get_width()) // 2, 100 + x * 5 + y * 5 - keeper_img.get_height() + 15))
             
             # draw dinosaurs
             for y, row in enumerate(map_data):
                 for x, tile in enumerate(row):
                     for dino in dino_data:
-                        if [x,y,"triceratops"] == dino:
+                        if [x, y, "triceratops"] == dino:
                             display.blit(triceratops_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - triceratops_img.get_width()) // 2, 100 + x * 5 + y * 5 - triceratops_img.get_height() + 15))
                         
-                        if [x,y,"trex"] == dino:
+                        if [x, y, "trex"] == dino:
                             display.blit(trex_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - trex_img.get_width()) // 2, 100 + x * 5 + y * 5 - trex_img.get_height() + 15))
 
             # draw cursor
             for y, row in enumerate(map_data):
                 for x, tile in enumerate(row):
-                    if [x,y] == player_data:
+                    if [x, y] == player_data:
                         display.blit(cursor_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - cursor_img.get_width()) // 2, 100 + x * 5 + y * 5 - cursor_img.get_height() + 15))
+                        if pizza_stand:
+                            display.blit(pizza_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - pizza_img.get_width()) // 2, 100 + x * 5 + y * 5 - pizza_img.get_height() + 15))
+
+                        if soda_stand:
+                            display.blit(soda_img, (150 + x * 10 - y * 10  + (grass_img.get_width() - soda_img.get_width()) // 2, 100 + x * 5 + y * 5 - soda_img.get_height() + 15))
 
             time.sleep(0.1)
             screen.blit(pygame.transform.scale(display, screen.get_size()), (0, 0))
